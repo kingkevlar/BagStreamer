@@ -2,12 +2,12 @@
 TOPICS:
   ODOM:
       message_topic: "/odom"
-  # ABSODOM:
-  #     message_topic: "/absodom"
-  # CAMERA_LEFT_INFO:
-  #     message_topic: "/stereo/left/camera_info"
-  # CAMERA_LEFT_RAW:
-  #    message_topic: "/stereo/left/image_raw"
+  ABSODOM:
+      message_topic: "/absodom"
+  CAMERA_LEFT_INFO:
+      message_topic: "/stereo/left/camera_info"
+  CAMERA_LEFT_RAW:
+     message_topic: "/stereo/left/image_raw"
 
 #  CAMERA_RIGHT_INFO:
 #      message_topic: "/stereo/right_camera_info"

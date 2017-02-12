@@ -32,6 +32,7 @@ class BagStream(object):
        
         self.streaming = True
         self.dumping = False    
+
     def make_dicts(self):    
         '''
         make dictionaries with deques() that will be filled with topics
@@ -46,7 +47,7 @@ class BagStream(object):
         for topics in topics.values():
             self.topic_list[topics['message_topic']] = deque()
 
-
+        rospy.loginfo('topics: %s', self.topic_list.keys())
 
     def subscribe(self):
         '''
@@ -94,7 +95,7 @@ class BagStream(object):
 
         rospy.loginfo('bagging commencing!')
             
-        for topic in self.topic_list:
+        for topic in self.topic_list.keys():
             for msgs in self.topic_list[topic]:
                 # bag.write(topic, msgs[1]) 
 

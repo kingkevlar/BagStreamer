@@ -11,9 +11,10 @@ import rospkg
 from bag_stream import BagStream
 
 
-if __name__ == '__main__':
-    rospy.init_node('streamer', anonymous = True)
-    stream = BagStream()
-    rospy.spin()
+# if __name__ == '__main__':
+rospy.init_node('streamer')
+    # stream = BagStream()
+print 'bleh'
+rospy.spin()
 
     
