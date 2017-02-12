@@ -1,4 +1,6 @@
 
+
+
 #!/usr/bin/env python
 
 import rospy
@@ -19,20 +21,17 @@ class BagStream(object):
         - add a re subscribing option for anything that failed? maybe...? 
         '''
         rospack = rospkg.RosPack()
-        directory  = os.path.join(rospack.get_path('beginner_tutorials'), 'scripts/')
-
+        directory  = os.path.join(rospack.get_path('beginner_tutorials'), 'scripts/')   
         self.directory = directory
         self.failed_topics = []
         
         self.make_dicts()
         self.subscribe()
-        self.n = 0 # number of iterations
-
+        self.n = 0 # number of iterations   
         # self.resubscribe
        
         self.streaming = True
-        self.dumping = False
-
+        self.dumping = False    
     def make_dicts(self):    
         '''
         make dictionaries with deques() that will be filled with topics
@@ -52,8 +51,7 @@ class BagStream(object):
     def subscribe(self):
         '''
         Immediately initiated when an instance of the BagStream class is created:
-        subscribes to the set of topics defined in the yaml configuration file
-
+        subscribes to the set of topics defined in the yaml configuration file  
         '''
         # empty list that can be resubscribed to at a later time
 
@@ -82,6 +80,9 @@ class BagStream(object):
             else:
                  pass
 
+            if self.n == 500:
+                self.start_bagging()
+
     def start_bagging(self):
         '''
         dumps all of the data to bags, temporarily stops streaming 
@@ -89,12 +90,16 @@ class BagStream(object):
         '''
         self.dumping = True
         self.streaming = False
-        bag = rosbag.Bag('ooka.bag', 'w')
+        bag = rosbag.Bag('ooka.bag', 'w')   
+
+        rospy.loginfo('bagging commencing!')
             
         for topic in self.topic_list:
             for msgs in self.topic_list[topic]:
+                # bag.write(topic, msgs[1]) 
+
                 bag.write(topic, msgs[1], t=msgs[0])
-
+                rospy.loginfo('topic: %s, message type: %s, time: %s', topic, type(msgs[1]), type(msgs[0]))
+        bag.close()
+        rospy.loginfo('bagging finished!')
         self.streaming = True  
-
-

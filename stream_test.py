@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 
 import rospy
@@ -9,9 +10,9 @@ import yaml
 import rospkg
 from bag_stream import BagStream
 
+
 if __name__ == '__main__':
-    rospy.init_node('streamer')
-   
+    rospy.init_node('streamer', anonymous = True)
     stream = BagStream()
     rospy.spin()
 
