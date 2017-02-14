@@ -1,6 +1,4 @@
 
-
-
 #!/usr/bin/env python
 
 import rospy
@@ -10,9 +8,12 @@ import rostopic
 from collections import deque
 import yaml
 import rospkg
+from beginner_tutorials.srv import StartBagging
 
+        
 class BagStream(object):
     def __init__(self):
+
         '''
         - makes dictionary of dequeues
         - subscribes to set of topics defined by the yaml file in directory
@@ -20,6 +21,7 @@ class BagStream(object):
         - option to bag data
         - add a re subscribing option for anything that failed? maybe...? 
         '''
+
         rospack = rospkg.RosPack()
         directory  = os.path.join(rospack.get_path('beginner_tutorials'), 'scripts/')   
         self.directory = directory
@@ -33,6 +35,8 @@ class BagStream(object):
         self.streaming = True
         self.dumping = False    
 
+        self.bagging_service = rospy.Service('/bagging_server', StartBagging, self.start_bagging)
+
     def make_dicts(self):    
         '''
         make dictionaries with deques() that will be filled with topics
@@ -43,6 +47,7 @@ class BagStream(object):
 
         topics = self.topics_to_stream['TOPICS']
         self.topic_list = {}
+
         
         for topics in topics.values():
             self.topic_list[topics['message_topic']] = deque()
@@ -61,8 +66,7 @@ class BagStream(object):
             if msg_class[1] == None:
                 self.failed_topics.append(topic)	
             else:
-               rospy.Subscriber(topic, msg_class[0], lambda msg, _topic=topic: 
-               self.callback(msg, _topic))
+               rospy.Subscriber(topic, msg_class[0], lambda msg, _topic=topic: self.callback(msg, _topic))
 
     def callback(self, msg, topic):
         # stream, callback function does nothing if streaming is not active
@@ -80,27 +84,37 @@ class BagStream(object):
                 self.topic_list[topic].popleft()
             else:
                  pass
+            # temp test delete
+            # if self.n == 500:
+            #     req.bagging = True
+            #     self.start_bagging(req)
 
-            if self.n == 500:
-                self.start_bagging()
-
-    def start_bagging(self):
+    def start_bagging(self, req):
         '''
         dumps all of the data to bags, temporarily stops streaming 
         during the bagging process, resumes streaming when over
         '''
-        self.dumping = True
+        self.dumping = req.startbagging
         self.streaming = False
         bag = rosbag.Bag('ooka.bag', 'w')   
 
+        rospy.loginfo('dumping value: %s', self.dumping)
         rospy.loginfo('bagging commencing!')
             
         for topic in self.topic_list.keys():
+            rospy.loginfo('topic: %s', topic)
             for msgs in self.topic_list[topic]:
-                # bag.write(topic, msgs[1]) 
 
                 bag.write(topic, msgs[1], t=msgs[0])
-                rospy.loginfo('topic: %s, message type: %s, time: %s', topic, type(msgs[1]), type(msgs[0]))
+                # rospy.loginfo('topic: %s, message type: %s, time: %s', topic, type(msgs[1]), type(msgs[0]))
+        
         bag.close()
         rospy.loginfo('bagging finished!')
         self.streaming = True  
+
+        return True
+
+if __name__ == "__main__":
+    rospy.init_node('ooka')
+    stream = BagStream()
+    rospy.spin()
